@@ -1,4 +1,5 @@
 #include "mypolygon.h"
+#include"mainwindow.h"
 #include<iphlpapi.h>
 #include<iostream>
 
@@ -13,6 +14,36 @@ MyPolygon::~MyPolygon()
 
 }
 
+void MyPolygon::setPontEndStartOffset(int x, int y)
+{
+    QPolygon polygonNew;
+    int dx = center.x() - polygon[0].x();
+    int dy = center.y() - polygon[0].y();
+    x-=dx;
+    y-=dy;
+    polygonNew << QPoint(x,y);
+    for(int i = 1; i < polygon.size();i++)
+    {
+        int dx = polygon[i].x() - polygon[0].x();
+        int dy = polygon[i].y() - polygon[0].y();
+        polygonNew << QPoint(x+dx,y+dy);
+    }
+    int cx = 0;
+    int cy = 0;
+    for(int i = 1; i < polygonNew.size();i++)
+    {
+        cx += polygonNew[i].x();
+        cy += polygonNew[i].y();
+    }
+    cx /= (polygonNew.size()-1);
+    cy /= (polygonNew.size()-1);
+    cx+=250;
+    cy+=250;
+    center.setX(cx);
+    center.setY(cy);
+    polygon = polygonNew;
+}
+
 void MyPolygon::slotGameTimer()
 {
     if( painted)
@@ -22,8 +53,6 @@ void MyPolygon::slotGameTimer()
     if(!state &&  GetAsyncKeyState(VK_LBUTTON))
     {
         polygon << QPoint(target.x()-250,target.y()-250);
-        xVector.push_back(target.x());
-        yVector.push_back(target.y());
         pointStart = target;
         state = true;
     }
@@ -33,10 +62,19 @@ void MyPolygon::slotGameTimer()
     }
     if(state &&  !GetAsyncKeyState(VK_LBUTTON) && fl == 3)
     {
-        int sumX = std::accumulate(xVector.begin(),xVector.end(),0);
-        int sumY = std::accumulate(yVector.begin(),yVector.end(),0);
-        center.setX(sumX/xVector.size());
-        center.setY(sumY/yVector.size());
+        int cx = 0;
+        int cy = 0;
+        for(int i = 1; i < polygon.size();i++)
+        {
+            cx += polygon[i].x();
+            cy += polygon[i].y();
+        }
+        cx /= (polygon.size()-1);
+        cy /= (polygon.size()-1);
+        cx+=250;
+        cy+=250;
+        center.setX(cx);
+        center.setY(cy);
         pointEnd = target;
         state = false;
         if(!painted && pointEnd != pointStart)
@@ -47,17 +85,16 @@ void MyPolygon::slotGameTimer()
     }
     if(state &&  GetAsyncKeyState(VK_LBUTTON) && fl == 1)
     {
-        int x = target.x();
-        int y = target.y();
-        if(x - xVector[0] < 10 && y - yVector[0] < 10 && xVector.size()>2)
+        auto point  = target;
+        point.setX(target.x()-250);
+        point.setY(target.y()-250);
+        if(MainWindow::neerPoints(point.toPoint(),polygon[0],10) && polygon.size()>3)
         {
             fl = 3;
         }
         else
         {
             polygon << QPoint(target.x()-250,target.y()-250);
-            xVector.push_back(target.x());
-            yVector.push_back(target.y());
             fl = 0;
         }
     }
@@ -74,12 +111,17 @@ void MyPolygon::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
     {
         painter->drawEllipse(center.x()-this->x(),center.y()-this->y(),10,10);
         painter->drawPolygon(polygon);
+
     }
     else
     {
-        for(auto i = 0; i < xVector.size()-1;i++)
+        for(auto i = 0; i < polygon.size()-1;i++)
         {
-            painter->drawLine(xVector[i]-250,yVector[i]-250,xVector[i+1]-250,yVector[i+1]-250);
+            painter->drawLine(polygon[i].x(),polygon[i].y(),polygon[i+1].x(),polygon[i+1].y());
+        }
+        if(polygon.size() > 0)
+        {
+            painter->drawLine(polygon[polygon.size()-1].x(),polygon[polygon.size()-1].y(),target.x()-250,target.y()-250);
         }
     }
     Q_UNUSED(option);

@@ -4,11 +4,14 @@
 MyLine::MyLine(QObject *parent)
     : MyShape(parent)
 {
+    pointStart = nullptr;
+    pointEnd = nullptr;
 }
 
 MyLine::~MyLine()
 {
-
+    pointStart = nullptr;
+    pointEnd = nullptr;
 }
 
 void MyLine::slotGameTimer()
@@ -23,8 +26,14 @@ QRectF MyLine::boundingRect() const
 
 void MyLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-
-    painter->drawLine(pointStart->getCenter(),pointEnd->getCenter());
+    if(painted)
+    {
+        painter->drawLine(pointStart->getCenter(),pointEnd->getCenter());
+    }
+    else
+    {
+        painter->drawLine(pointStart->getCenter(),target);
+    }
     Q_UNUSED(option);
     Q_UNUSED(widget);
 }

@@ -21,9 +21,14 @@ public:
     ~MainWindow();
 
     MyShape *createShape(int mode);
-    void clearShape();
+    void clearTempShape();
     void shapeToFile(MyShape *shape, QTextStream &stream);
     void lineToFile(MyLine *line, QTextStream &stream);
+    void setShapeFromTemp(MyShape *shape);
+    void setShapeFromString(MyShape *shape, QString string);
+    void setLineFromString(MyLine *line, QString string);
+
+    static bool neerPoints(QPoint p1, QPoint p2,int accuracy);
 public slots:
     void updateScene();
 
@@ -52,17 +57,12 @@ private:
     QVector<MyShape*> shapes;
     QVector<MyLine*> lines;
     MyShape *tempShape;
+    MyLine *tempLine;
     MyShape* movedShape;
     Ui::MainWindow *ui;
     MyScene  *scene;    // We declare a graphic scene
     QTimer *timer;
     int mode;
-    bool stateMove;
-    int x,y,X,Y,cx,cy;
     int fl;
-    QPointF lineStart,lineEnd;
-    MyLine *line;
-
-    //QPointF startPoint;
 };
 #endif // MAINWINDOW_H

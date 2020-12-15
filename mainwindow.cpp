@@ -21,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent)
      timer = new QTimer();
      connect(timer, &QTimer::timeout, this, &MainWindow::updateScene);
      timer->start(10);
-     scene   = new MyScene();    // Init custom scene
+     scene   = new MyScene();
 
      ui->graphicsView->setScene(scene);  /// set scene into graphicsView
      ui->graphicsView->setRenderHint(QPainter::Antialiasing);
@@ -30,17 +30,14 @@ MainWindow::MainWindow(QWidget *parent)
 
      scene->setSceneRect(0,0,500,500);
 
-     // Create Custom Cursor
      QCursor cursor = QCursor();
-     ui->graphicsView->setCursor(cursor);    // Set cursor intoe QGraphicsView
+     ui->graphicsView->setCursor(cursor);
 
      ui->graphicsView->setMouseTracking(true);
 
-     stateMove = false;
      tempShape = nullptr;
      movedShape = nullptr;
-
-     fl = 0;
+     tempLine = nullptr;
 
      connect(scene, &MyScene::signalTargetCoordinate, this, &MainWindow::slotTarget);
      connect(scene, &MyScene::signalMouseClick, this, &MainWindow::clickTarget);
@@ -80,7 +77,7 @@ MyShape *MainWindow::createShape(int mode)
     }
 }
 
-void MainWindow::clearShape()
+void MainWindow::clearTempShape()
 {
     scene->removeItem(tempShape);
     if(tempShape != nullptr)
@@ -88,6 +85,12 @@ void MainWindow::clearShape()
         delete tempShape;
     }
     tempShape = nullptr;
+    scene->removeItem(movedShape);
+    if(movedShape != nullptr)
+    {
+        delete movedShape;
+    }
+    movedShape = nullptr;
 }
 
 void MainWindow::shapeToFile(MyShape *shape, QTextStream &stream)
@@ -113,6 +116,73 @@ void MainWindow::lineToFile(MyLine *line, QTextStream &stream)
     stream << line->getPointStart()->getName() << "|"<<line->getPointEnd()->getName()<<"\n";
 }
 
+void MainWindow::setShapeFromTemp(MyShape *shape)
+{
+    QString name;
+    shape->setPointStart(tempShape->getPointStart());
+    shape->setPointEnd(tempShape->getPointEnd());
+    shape->setPolygon(tempShape->getPolygon());
+    shape->setPos(tempShape->x(),tempShape->y());
+    shape->setCenter(tempShape->getCenter().x(),tempShape->getCenter().y());
+    shape->setPainted(true);
+    name += QString().number(mode) + "/" +QString().number(shapes.size()+1);
+    shape->setName(name);
+}
+
+void MainWindow::setShapeFromString(MyShape *shape, QString string)
+{
+    auto vStr = string.split("|");
+    auto vName = vStr[0].split("/");
+    shape->setName(vStr[0]);
+    shape->setX(vStr[1].toInt());
+    shape->setY(vStr[2].toInt());
+    if(vName[0].toInt() == 3)
+    {
+        shape->setCenter(vStr[3].toInt(),vStr[4].toInt());
+        for(int i = 5; i < vStr.size()-1; i+= 2)
+        {
+            shape->setPolygon(shape->getPolygon() << QPoint(vStr[i].toInt(),vStr[i+1].toInt()));
+        }
+
+    }
+    else
+    {
+        shape->setPointStart(QPoint(vStr[3].toInt(),vStr[4].toInt()));
+        shape->setPointEnd(QPoint(vStr[5].toInt(),vStr[6].toInt()));
+        shape->setCenter(vStr[7].toInt(),vStr[8].toInt());
+    }
+    shape->setPainted(true);
+}
+
+void MainWindow::setLineFromString(MyLine *line, QString string)
+{
+    auto vStr = string.split("|");
+    for(auto shape : shapes)
+    {
+        if(shape->getName() == vStr[0])
+        {
+            line->setPointStart(shape);
+        }
+        if(shape->getName() == vStr[1])
+        {
+            line->setPointEnd(shape);
+        }
+    }
+    line->setPainted(true);
+}
+
+bool MainWindow::neerPoints(QPoint p1, QPoint p2,int accuracy)
+{
+    if(abs(p1.x() - p2.x())<accuracy && abs(p1.y() - p2.y())<accuracy)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 void MainWindow::updateScene()
 {
     scene->update();
@@ -132,7 +202,7 @@ void MainWindow::updateScene()
 
 void MainWindow::addShape()
 {
-    QString name;
+
     if(tempShape == nullptr)
     {
         return;
@@ -141,19 +211,10 @@ void MainWindow::addShape()
     shape = createShape(mode);
     if(mode < 4)
     {
-        shape->setPointStart(tempShape->getPointStart());
-        shape->setPointEnd(tempShape->getPointEnd());
-        shape->setPolygon(tempShape->getPolygon());
-        shape->setPos(tempShape->x(),tempShape->y());
-        shape->setCenter(tempShape->getCenter().x(),tempShape->getCenter().y());
-        shape->setPainted(true);
-        name += QString().number(mode) + "/" +QString().number(shapes.size()+1);
-        shape->setName(name);
-        scene->removeItem(tempShape);
+        setShapeFromTemp(shape);
         scene->addItem(shape);
         shapes.push_back(shape);
-        std::cout<<shapes.size()<<std::endl;
-        tempShape = nullptr;
+        clearTempShape();
      }
     else
     {
@@ -165,72 +226,56 @@ void MainWindow::slotTarget(QPointF point)
 {
     if(mode == 4)
     {
-        if(!stateMove && GetAsyncKeyState(VK_LBUTTON))
+        if(movedShape == nullptr && GetAsyncKeyState(VK_LBUTTON))
         {
             for(auto shape : shapes)
             {
-                auto pointCenter = shape->getCenter();
-                if(abs(pointCenter.x() - (point.x())) < 10 && abs(pointCenter.y() - (point.y())) < 10)
+                if(neerPoints(shape->getCenter(),point.toPoint(),30))
                 {
-                    x = point.x();
-                    y = point.y();
-                    X = shape->x();
-                    Y = shape->y();
-                    cx = pointCenter.x();
-                    cy = pointCenter.y();
                     movedShape = shape;
-                    stateMove = true;
                     break;
                 }
             }
         }
-        if(stateMove && GetAsyncKeyState(VK_LBUTTON))
+        if(movedShape != nullptr && GetAsyncKeyState(VK_LBUTTON))
         {
-            int dx = point.x() - x;
-            int dy = point.y() - y;
-
-            movedShape->setX(X + dx);
-            movedShape->setY(Y + dy);
-            movedShape->setCenter(cx + dx,cy + dy);
+            movedShape->setPontEndStartOffset(point.x(),point.y());
         }
-        if(stateMove && !GetAsyncKeyState(VK_LBUTTON))
+        if(movedShape != nullptr && !GetAsyncKeyState(VK_LBUTTON))
         {
-            stateMove = false;
             movedShape = nullptr;
         }
     }
-
 }
 
 void MainWindow::clickTarget(QPointF point)
 {
     if(mode == 5)
     {
-        if(fl == 0)
+        if(tempLine == nullptr)
         {
             for(auto shape : shapes)
             {
-                auto pointCenter = shape->getCenter();
-                if(abs(pointCenter.x() - (point.x())) < 30 && abs(pointCenter.y() - (point.y())) < 30)
+                if(neerPoints(shape->getCenter(),point.toPoint(),30))
                 {
-                    line = new MyLine;
-                    line->setPointStart(shape);
-                    fl = 1;
+                    tempLine = new MyLine;
+                    connect(scene, &MyScene::signalTargetCoordinate, tempLine, &MyShape::slotTarget);
+                    tempLine->setPointStart(shape);
+                    scene->addItem(tempLine);
                     return;
                 }
             }
         }
-        if(fl == 1)
+        if(tempLine != nullptr)
         {
             for(auto shape : shapes)
             {
-                auto pointCenter = shape->getCenter();
-                if(abs(pointCenter.x() - (point.x())) < 30 && abs(pointCenter.y() - (point.y())) < 30)
+                if(neerPoints(shape->getCenter(),point.toPoint(),30))
                 {
-                    line->setPointEnd(shape);
-                    fl = 0;
-                    scene->addItem(line);
-                    lines.push_back(line);
+                    tempLine->setPointEnd(shape);
+                    tempLine->setPainted(true);
+                    lines.push_back(tempLine);
+                    tempLine = nullptr;
                     return;
                 }
             }
@@ -240,32 +285,31 @@ void MainWindow::clickTarget(QPointF point)
 void MainWindow::on_rectButtton_clicked()
 {
     mode = 1;
-    clearShape();
-
+    clearTempShape();
 }
 
 void MainWindow::on_ellipsButton_clicked()
 {
     mode = 2;
-    clearShape();
+    clearTempShape();
 }
 
 void MainWindow::on_anngleButton_clicked()
 {
     mode = 3;
-    clearShape();
+    clearTempShape();
 }
 
 void MainWindow::on_moveButton_clicked()
 {
     mode = 4;
-    clearShape();
+    clearTempShape();
 }
 
 void MainWindow::on_linkButton_clicked()
 {
     mode = 5;
-    clearShape();
+    clearTempShape();
 }
 
 void MainWindow::on_saveButton_clicked()
@@ -285,8 +329,6 @@ void MainWindow::on_saveButton_clicked()
         lineToFile(line,write);
     }
     file.close();
-
-
 }
 
 void MainWindow::on_loadButton_clicked()
@@ -294,18 +336,8 @@ void MainWindow::on_loadButton_clicked()
     lines.clear();
     shapes.clear();
     mode = 0;
-    if(tempShape != nullptr)
-    {
-        delete tempShape;
-        tempShape = nullptr;
-    }
-    if(movedShape != nullptr)
-    {
-        delete movedShape;
-        movedShape = nullptr;
-    }
+    clearTempShape();
     scene->clear();
-    stateMove = false;
     fl = 0;
     auto fileName = QFileDialog::getOpenFileName(this,
                 tr("Save install file"), "",
@@ -327,45 +359,16 @@ void MainWindow::on_loadButton_clicked()
             auto vStr = str.split("|");
             auto vName = vStr[0].split("/");
             MyShape *myShape = createShape(vName[0].toInt());
-            myShape->setName(vStr[0]);
-            myShape->setX(vStr[1].toInt());
-            myShape->setY(vStr[2].toInt());
-            if(vName[0].toInt() == 3)
-            {
-                myShape->setCenter(vStr[3].toInt(),vStr[4].toInt());
-                for(int i = 5; i < vStr.size()-1; i+= 2)
-                {
-                    myShape->setPolygon(myShape->getPolygon() << QPoint(vStr[i].toInt(),vStr[i+1].toInt()));
-                }
-
-            }
-            else
-            {
-                myShape->setPointStart(QPoint(vStr[3].toInt(),vStr[4].toInt()));
-                myShape->setPointEnd(QPoint(vStr[5].toInt(),vStr[6].toInt()));
-                myShape->setCenter(vStr[7].toInt(),vStr[8].toInt());
-            }
-            myShape->setPainted(true);
+            setShapeFromString(myShape,str);
             shapes.push_back(myShape);
             scene->addItem(myShape);
         }
         else
         {
             MyLine *line = new MyLine();
-            auto vStr = str.split("|");
-            for(auto shape : shapes)
-            {
-                if(shape->getName() == vStr[0])
-                {
-                    line->setPointStart(shape);
-                }
-                if(shape->getName() == vStr[1])
-                {
-                    line->setPointEnd(shape);
-                }
-                lines.push_back(line);
-                scene->addItem(line);
-            }
+            setLineFromString(line,str);
+            lines.push_back(line);
+            scene->addItem(line);
         }
     }
     mode = 1;

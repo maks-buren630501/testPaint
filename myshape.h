@@ -36,12 +36,11 @@ public:
     QString getName() const;
     void setName(const QString &value);
 
-    void setPontEndStartOffset(int x, int y);
+    virtual void setPontEndStartOffset(int x, int y);
 
 signals:
     void addShapeSignal();
 public slots:
-    // The slot for the cursor position data
     virtual void slotTarget(QPointF point);
     virtual void slotGameTimer();
 
@@ -51,8 +50,8 @@ private:
 
 protected:
     QString name;
-    QTimer *gameTimer;      // Game timer
-    QPointF target;         // Cursor position
+    QTimer *timer;
+    QPointF target;
     QPointF pointStart;
     QPointF pointEnd;
     QPoint center;

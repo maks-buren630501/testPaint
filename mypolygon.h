@@ -15,6 +15,7 @@ class MyPolygon : public MyShape
 public:
     explicit MyPolygon(QObject *parent = 0);
     ~MyPolygon();
+    void setPontEndStartOffset(int x, int y);
 public slots:
 
     virtual void slotGameTimer();
@@ -22,8 +23,6 @@ public slots:
 private:
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-    QVector<int> xVector;
-    QVector<int> yVector;
     int fl;
 
 };

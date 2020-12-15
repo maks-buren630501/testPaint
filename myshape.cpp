@@ -44,7 +44,16 @@ void MyShape::setName(const QString &value)
 
 void MyShape::setPontEndStartOffset(int x, int y)
 {
-    //pointStart.setX();
+    int dx = pointEnd.x() - pointStart.x();
+    int dy = pointEnd.y() - pointStart.y();
+    x-=dx/2;
+    y-=dy/2;
+    pointStart.setX(x);
+    pointStart.setY(y);
+    pointEnd.setX(x + dx);
+    pointEnd.setY(y + dy);
+    center.setX(pointStart.x() + dx/2);
+    center.setY(pointStart.y() + dy/2);
 }
 
 QPolygon MyShape::getPolygon() const

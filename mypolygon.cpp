@@ -42,6 +42,77 @@ void MyPolygon::setPontEndStartOffset(int x, int y)
     polygon = polygonNew;
 }
 
+bool MyPolygon::atShape(QPoint point)
+{
+    int y = point.y();
+    int x = point.x() + 1000;
+    QPoint p2(x,y);
+    QLine crosLine(point,p2);
+    int t = 0;
+    for(int i = 1; i < polygon.size() - 1; i++)
+    {
+        QLine line(polygon[i],polygon[i+1]);
+        if(isCross(line,crosLine))
+        {
+            t++;
+        }
+    }
+    std::cout <<"t = "<<t<<"\n";
+    if(t % 2 == 0)
+    {
+        return false;
+    }
+    else
+    {
+        return true;
+    }
+}
+
+bool MyPolygon::isCross(QLine a, QLine b)
+{
+    double x1 = a.x1();
+    double x2 = a.x2();
+    double x3 = b.x1();
+    double x4 = b.x2();
+    double y1 = a.y1();
+    double y2 = a.y2();
+    double y3 = b.y1();
+    double y4 = b.y2();
+    if(x1 >= x2)
+    {
+        std::swap(x1,x2);
+        std::swap(y1,y2);
+    }
+    if(x3 >= x4)
+    {
+        std::swap(x3,x4);
+        std::swap(y3,y4);
+    }
+    double k1 = 0;
+    double k2 = 0;
+    if(y2 != y1)
+    {
+       k1 =  ( y2 - y1 ) / ( x2 - x1 );
+    }
+    if(y3 != y4)
+    {
+        k2 =  ( y4 - y3 ) / ( x4 - x3 );
+    }
+    if(k1 == k2)
+    {
+        return false;
+    }
+    if((x1 <= x4 && x4 <= x2)||(x1 <= x3 && x3 <= x2))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+
+}
+
 void MyPolygon::slotGameTimer()
 {
     if( painted)

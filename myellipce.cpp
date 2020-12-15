@@ -10,6 +10,22 @@ MyEllipce::~MyEllipce()
 
 }
 
+bool MyEllipce::atShape(QPoint point)
+{
+    double dx = abs(pointEnd.x() - pointStart.x()) / 2;
+    double dy = abs(pointEnd.y() - pointStart.y()) / 2;
+    double x = point.x() - center.x();
+    double y = point.y() - center.y();
+    if ((x*x)/(dx*dx) + (y*y)/(dy*dy) <= 1.0)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 QRectF MyEllipce::boundingRect() const
 {
     return QRectF(-20,-30,40,60);

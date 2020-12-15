@@ -15,6 +15,7 @@ class MyEllipce : public MyShape
 public:
     explicit MyEllipce(QObject *parent = 0);
     ~MyEllipce();
+    bool atShape(QPoint point);
 
 
 private:

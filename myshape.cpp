@@ -55,6 +55,11 @@ void MyShape::setPontEndStartOffset(int x, int y)
     center.setY(pointStart.y() + dy/2);
 }
 
+bool MyShape::atShape(QPoint point)
+{
+
+}
+
 QPolygon MyShape::getPolygon() const
 {
     return polygon;
@@ -133,3 +138,5 @@ void MyShape::slotGameTimer()
         }
     }
 }
+
+

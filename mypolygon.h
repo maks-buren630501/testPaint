@@ -16,6 +16,8 @@ public:
     explicit MyPolygon(QObject *parent = 0);
     ~MyPolygon();
     void setPontEndStartOffset(int x, int y);
+    bool atShape(QPoint point);
+    bool isCross(QLine a, QLine b);
 public slots:
 
     virtual void slotGameTimer();

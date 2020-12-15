@@ -198,19 +198,18 @@ void MainWindow::updateScene()
         return;
     }
     tempShape = createShape(mode);
-    if(tempShape != nullptr)
+    if(tempShape != nullptr && mode < 4)
     {
         tempShape->setPos(0,0);
         scene->addItem(tempShape);
         connect(scene, &MyScene::signalTargetCoordinate, tempShape, &MyShape::slotTarget);
         connect(tempShape, &MyShape::addShapeSignal, this, &MainWindow::addShape);
-
     }
 }
 
 void MainWindow::addShape()
 {
-
+    tempShape->setName(QString().number(mode) + "/" + QString().number(shapes.size()+1));
     shapes.push_back(tempShape);
     tempShape = nullptr;
 }
@@ -223,7 +222,8 @@ void MainWindow::slotTarget(QPointF point)
         {
             for(auto shape : shapes)
             {
-                if(neerPoints(shape->getCenter(),point.toPoint(),30))
+                //if(neerPoints(shape->getCenter(),point.toPoint(),30))
+                if(shape->atShape(point.toPoint()))
                 {
                     movedShape = shape;
                     break;

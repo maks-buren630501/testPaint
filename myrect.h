@@ -17,6 +17,8 @@ public:
     explicit MyRect(QObject *parent = 0);
     ~MyRect();
 
+    bool atShape(QPoint point);
+
 
 private:
     QRectF boundingRect() const;

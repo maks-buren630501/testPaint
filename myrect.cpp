@@ -10,6 +10,39 @@ MyRect::~MyRect()
 
 }
 
+bool MyRect::atShape(QPoint point)
+{
+    if(pointStart.x() > pointEnd.x())
+    {
+        if(point.x() > pointStart.x() || point.x() < pointEnd.x())
+        {
+            return false;
+        }
+    }
+    else
+    {
+        if(point.x() > pointEnd.x() || point.x() < pointStart.x())
+        {
+            return false;
+        }
+    }
+    if(pointStart.y() > pointEnd.y())
+    {
+        if(point.y() > pointStart.y() || point.y() < pointEnd.y())
+        {
+            return false;
+        }
+    }
+    else
+    {
+        if(point.y() > pointEnd.y() || point.y() < pointStart.y())
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
 QRectF MyRect::boundingRect() const
 {
     return QRectF(-20,-30,40,60);

@@ -38,11 +38,14 @@ public:
 
     virtual void setPontEndStartOffset(int x, int y);
 
+    virtual bool atShape(QPoint point);
+
 signals:
     void addShapeSignal();
 public slots:
     virtual void slotTarget(QPointF point);
     virtual void slotGameTimer();
+
 
 private:
     virtual QRectF boundingRect() const;

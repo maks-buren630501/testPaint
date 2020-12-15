@@ -58,7 +58,5 @@ protected:
     bool state;
     bool painted;
     QPolygon polygon;
-
-
 };
 #endif // MYSHAPE_H

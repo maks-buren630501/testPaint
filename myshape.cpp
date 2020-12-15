@@ -5,20 +5,19 @@
 MyShape::MyShape(QObject *parent) :
     QObject(parent), QGraphicsItem()
 {
-    setRotation(0);      // Set the starting triangle rotation
-    gameTimer = new QTimer();   // Init game timer
-    // Connect the signal from the timer and the slot game processing timer
-    connect(gameTimer, &QTimer::timeout, this, &MyShape::slotGameTimer);
-    gameTimer->start(30);   // Start timer
-    target = QPointF(0,0);  // Set the initial position of the cursor
+    setRotation(0);
+    timer = new QTimer();
+    connect(timer, &QTimer::timeout, this, &MyShape::slotGameTimer);
+    timer->start(30);
+    target = QPointF(0,0);
     state = false;
     painted = false;
 }
 
 MyShape::~MyShape()
 {
-    gameTimer->stop();
-    delete gameTimer;
+    timer->stop();
+    delete timer;
 }
 
 QRectF MyShape::boundingRect() const

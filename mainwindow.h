@@ -65,5 +65,6 @@ private:
     QTimer *timer;
     int mode;
     int fl;
+    int x,y;
 };
 #endif // MAINWINDOW_H

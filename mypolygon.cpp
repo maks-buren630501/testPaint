@@ -17,16 +17,9 @@ MyPolygon::~MyPolygon()
 void MyPolygon::setPontEndStartOffset(int x, int y)
 {
     QPolygon polygonNew;
-    int dx = center.x() - polygon[0].x();
-    int dy = center.y() - polygon[0].y();
-    x-=dx;
-    y-=dy;
-    polygonNew << QPoint(x,y);
-    for(int i = 1; i < polygon.size();i++)
+    for(auto point : polygon)
     {
-        int dx = polygon[i].x() - polygon[0].x();
-        int dy = polygon[i].y() - polygon[0].y();
-        polygonNew << QPoint(x+dx,y+dy);
+        polygonNew << QPoint(point.x() + x,point.y() + y);
     }
     int cx = 0;
     int cy = 0;
@@ -57,7 +50,6 @@ bool MyPolygon::atShape(QPoint point)
             t++;
         }
     }
-    std::cout <<"t = "<<t<<"\n";
     if(t % 2 == 0)
     {
         return false;
@@ -104,13 +96,33 @@ bool MyPolygon::isCross(QLine a, QLine b)
     }
     if((x1 <= x4 && x4 <= x2)||(x1 <= x3 && x3 <= x2))
     {
-        return true;
+        if(y1 > y2)
+        {
+            if((y3 >= y2 && y3 <= y1) || (y4 >= y2 && y4 <= y1))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            if((y3 <= y2 && y3 >= y1) || (y4 <= y2 && y4 >= y1))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
     }
     else
     {
         return false;
     }
-
 }
 
 void MyPolygon::slotGameTimer()

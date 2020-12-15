@@ -222,9 +222,10 @@ void MainWindow::slotTarget(QPointF point)
         {
             for(auto shape : shapes)
             {
-                //if(neerPoints(shape->getCenter(),point.toPoint(),30))
                 if(shape->atShape(point.toPoint()))
                 {
+                    x = point.x();
+                    y = point.y();
                     movedShape = shape;
                     break;
                 }
@@ -232,7 +233,11 @@ void MainWindow::slotTarget(QPointF point)
         }
         if(movedShape != nullptr && GetAsyncKeyState(VK_LBUTTON))
         {
-            movedShape->setPontEndStartOffset(point.x(),point.y());
+            int dx = point.x() - x;
+            int dy = point.y() - y;
+            x = point.x();
+            y = point.y();
+            movedShape->setPontEndStartOffset(dx,dy);
         }
         if(movedShape != nullptr && !GetAsyncKeyState(VK_LBUTTON))
         {
@@ -249,7 +254,7 @@ void MainWindow::clickTarget(QPointF point)
         {
             for(auto shape : shapes)
             {
-                if(neerPoints(shape->getCenter(),point.toPoint(),30))
+                if(shape->atShape(point.toPoint()))
                 {
                     tempLine = new MyLine;
                     connect(scene, &MyScene::signalTargetCoordinate, tempLine, &MyShape::slotTarget);
@@ -263,7 +268,7 @@ void MainWindow::clickTarget(QPointF point)
         {
             for(auto shape : shapes)
             {
-                if(neerPoints(shape->getCenter(),point.toPoint(),30))
+                if(shape->atShape(point.toPoint()))
                 {
                     tempLine->setPointEnd(shape);
                     tempLine->setPainted(true);

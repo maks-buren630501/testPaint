@@ -45,12 +45,10 @@ void MyShape::setPontEndStartOffset(int x, int y)
 {
     int dx = pointEnd.x() - pointStart.x();
     int dy = pointEnd.y() - pointStart.y();
-    x-=dx/2;
-    y-=dy/2;
-    pointStart.setX(x);
-    pointStart.setY(y);
-    pointEnd.setX(x + dx);
-    pointEnd.setY(y + dy);
+    pointStart.setX(pointStart.x() + x);
+    pointStart.setY(pointStart.y() + y);
+    pointEnd.setX(pointEnd.x() + x);
+    pointEnd.setY(pointEnd.y() + y);
     center.setX(pointStart.x() + dx/2);
     center.setY(pointStart.y() + dy/2);
 }

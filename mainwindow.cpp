@@ -93,6 +93,13 @@ void MainWindow::clearTempShape()
     movedShape = nullptr;
 }
 
+void MainWindow::setTempShapeNull()
+{
+    tempShape->setPainted(true);
+    scene->removeItem(tempShape);
+    tempShape = nullptr;
+}
+
 void MainWindow::shapeToFile(MyShape *shape, QTextStream &stream)
 {
     if(shape->getName().split("/").at(0).toInt() == 3)
@@ -197,29 +204,15 @@ void MainWindow::updateScene()
         scene->addItem(tempShape);
         connect(scene, &MyScene::signalTargetCoordinate, tempShape, &MyShape::slotTarget);
         connect(tempShape, &MyShape::addShapeSignal, this, &MainWindow::addShape);
+
     }
 }
 
 void MainWindow::addShape()
 {
 
-    if(tempShape == nullptr)
-    {
-        return;
-    }
-    MyShape *shape;
-    shape = createShape(mode);
-    if(mode < 4)
-    {
-        setShapeFromTemp(shape);
-        scene->addItem(shape);
-        shapes.push_back(shape);
-        clearTempShape();
-     }
-    else
-    {
-        return;
-    }
+    shapes.push_back(tempShape);
+    tempShape = nullptr;
 }
 
 void MainWindow::slotTarget(QPointF point)
@@ -285,31 +278,31 @@ void MainWindow::clickTarget(QPointF point)
 void MainWindow::on_rectButtton_clicked()
 {
     mode = 1;
-    clearTempShape();
+    setTempShapeNull();
 }
 
 void MainWindow::on_ellipsButton_clicked()
 {
     mode = 2;
-    clearTempShape();
+    setTempShapeNull();
 }
 
 void MainWindow::on_anngleButton_clicked()
 {
     mode = 3;
-    clearTempShape();
+    setTempShapeNull();
 }
 
 void MainWindow::on_moveButton_clicked()
 {
     mode = 4;
-    clearTempShape();
+    setTempShapeNull();
 }
 
 void MainWindow::on_linkButton_clicked()
 {
     mode = 5;
-    clearTempShape();
+    setTempShapeNull();
 }
 
 void MainWindow::on_saveButton_clicked()

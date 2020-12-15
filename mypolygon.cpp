@@ -75,8 +75,8 @@ void MyPolygon::slotGameTimer()
         state = false;
         if(!painted && pointEnd != pointStart)
         {
-            emit addShapeSignal();
             painted = true;
+            emit addShapeSignal();
         }
     }
     if(state &&  GetAsyncKeyState(VK_LBUTTON) && fl == 1)

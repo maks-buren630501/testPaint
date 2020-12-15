@@ -128,8 +128,8 @@ void MyShape::slotGameTimer()
         state = false;
         if(!painted && pointEnd != pointStart)
         {
-            emit addShapeSignal();
             painted = true;
+            emit addShapeSignal();
         }
     }
 }

@@ -22,6 +22,7 @@ public:
 
     MyShape *createShape(int mode);
     void clearTempShape();
+    void setTempShapeNull();
     void shapeToFile(MyShape *shape, QTextStream &stream);
     void lineToFile(MyLine *line, QTextStream &stream);
     void setShapeFromTemp(MyShape *shape);

@@ -21,7 +21,7 @@ void MyRect::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QW
     int y = (pointEnd.y() + pointStart.y())/2;
     int dx = pointEnd.x() - pointStart.x();
     int dy = pointEnd.y() - pointStart.y();
-    painter->drawRect(pointStart.x()-250,pointStart.y()-250,dx,dy);
+    painter->drawRect(pointStart.x(),pointStart.y(),dx,dy);
     if(!painted)
     {
         center.setX(x);

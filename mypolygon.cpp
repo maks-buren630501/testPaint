@@ -37,8 +37,6 @@ void MyPolygon::setPontEndStartOffset(int x, int y)
     }
     cx /= (polygonNew.size()-1);
     cy /= (polygonNew.size()-1);
-    cx+=250;
-    cy+=250;
     center.setX(cx);
     center.setY(cy);
     polygon = polygonNew;
@@ -52,7 +50,7 @@ void MyPolygon::slotGameTimer()
     }
     if(!state &&  GetAsyncKeyState(VK_LBUTTON))
     {
-        polygon << QPoint(target.x()-250,target.y()-250);
+        polygon << QPoint(target.x(),target.y());
         pointStart = target;
         state = true;
     }
@@ -71,8 +69,6 @@ void MyPolygon::slotGameTimer()
         }
         cx /= (polygon.size()-1);
         cy /= (polygon.size()-1);
-        cx+=250;
-        cy+=250;
         center.setX(cx);
         center.setY(cy);
         pointEnd = target;
@@ -86,15 +82,15 @@ void MyPolygon::slotGameTimer()
     if(state &&  GetAsyncKeyState(VK_LBUTTON) && fl == 1)
     {
         auto point  = target;
-        point.setX(target.x()-250);
-        point.setY(target.y()-250);
+        point.setX(target.x());
+        point.setY(target.y());
         if(MainWindow::neerPoints(point.toPoint(),polygon[0],10) && polygon.size()>3)
         {
             fl = 3;
         }
         else
         {
-            polygon << QPoint(target.x()-250,target.y()-250);
+            polygon << QPoint(target.x(),target.y());
             fl = 0;
         }
     }
@@ -121,7 +117,7 @@ void MyPolygon::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
         }
         if(polygon.size() > 0)
         {
-            painter->drawLine(polygon[polygon.size()-1].x(),polygon[polygon.size()-1].y(),target.x()-250,target.y()-250);
+            painter->drawLine(polygon[polygon.size()-1].x(),polygon[polygon.size()-1].y(),target.x(),target.y());
         }
     }
     Q_UNUSED(option);

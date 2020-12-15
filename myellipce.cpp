@@ -21,7 +21,7 @@ void MyEllipce::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
     int y = (pointEnd.y() + pointStart.y())/2;
     int dx = pointEnd.x() - pointStart.x();
     int dy = pointEnd.y() - pointStart.y();
-    painter->drawEllipse(pointStart.x()-250,pointStart.y()-250,dx,dy);
+    painter->drawEllipse(pointStart.x(),pointStart.y(),dx,dy);
     if(!painted)
     {
         center.setX(x);

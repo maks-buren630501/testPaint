@@ -193,7 +193,7 @@ void MainWindow::updateScene()
     tempShape = createShape(mode);
     if(tempShape != nullptr)
     {
-        tempShape->setPos(250,250);
+        tempShape->setPos(0,0);
         scene->addItem(tempShape);
         connect(scene, &MyScene::signalTargetCoordinate, tempShape, &MyShape::slotTarget);
         connect(tempShape, &MyShape::addShapeSignal, this, &MainWindow::addShape);

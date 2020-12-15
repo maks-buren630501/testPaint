@@ -18,6 +18,7 @@ MyShape::~MyShape()
 {
     timer->stop();
     delete timer;
+    polygon.clear();
 }
 
 QRectF MyShape::boundingRect() const
@@ -55,7 +56,7 @@ void MyShape::setPontEndStartOffset(int x, int y)
 
 bool MyShape::atShape(QPoint point)
 {
-
+    return false;
 }
 
 QPolygon MyShape::getPolygon() const

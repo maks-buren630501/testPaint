@@ -47,6 +47,23 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+    timer->stop();
+    delete timer;
+    if(tempShape != nullptr)
+    {
+        delete tempShape;
+    }
+    if(movedShape != nullptr)
+    {
+        delete movedShape;
+    }
+    if(tempLine != nullptr)
+    {
+        delete tempLine;
+    }
+    shapes.clear();
+    lines.clear();
+    delete scene;
     delete ui;
 }
 

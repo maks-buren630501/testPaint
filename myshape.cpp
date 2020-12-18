@@ -1,6 +1,6 @@
 #include "myshape.h"
 #include<iostream>
-#include<iphlpapi.h>
+#include<Windows.h>
 
 MyShape::MyShape(QObject *parent) :
     QObject(parent), QGraphicsItem()

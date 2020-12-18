@@ -8,7 +8,7 @@
 #include <QFileDialog>
 #include <QLineF>
 #include <QTextStream>
-#include<iphlpapi.h>
+#include<Windows.h>
 #include <typeinfo>
 
 

@@ -1,5 +1,5 @@
 #include "myline.h"
-#include<iphlpapi.h>
+#include<Windows.h>
 
 MyLine::MyLine(QObject *parent)
     : MyShape(parent)

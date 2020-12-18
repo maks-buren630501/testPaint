@@ -1,6 +1,6 @@
 #include "mypolygon.h"
 #include"mainwindow.h"
-#include<iphlpapi.h>
+#include<Windows.h>
 #include<iostream>
 
 MyPolygon::MyPolygon(QObject *parent)
